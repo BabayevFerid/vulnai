@@ -1,11 +1,41 @@
-import random
+import os
+import openai
 
-def analyze_services(xml_output):
-    # Bu hissəni XML'dən JSON parsinqə bağlayacağıq
-    return {
-        "vulnerabilities": [
-            {"service": "ssh", "risk": "high", "cve": "CVE-2020-15778"},
-            {"service": "http", "risk": "medium", "cve": "CVE-2021-41773"}
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+def analyze_services_with_openai(xml_summary: str):
+    prompt = f"""
+You are a cybersecurity analyst. Analyze the following scan result and identify potential vulnerabilities, CVEs, and risk levels.
+
+Scan summary:
+{xml_summary}
+
+Respond in this JSON format:
+{{
+  "vulnerabilities": [
+    {{
+      "service": "service_name",
+      "risk": "low | medium | high | critical",
+      "cve": "CVE-XXXX-XXXX",
+      "explanation": "Why this is a risk"
+    }}
+  ],
+  "summary": "brief human-readable summary"
+}}
+"""
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "You are a professional vulnerability analyst."},
+            {"role": "user", "content": prompt}
         ],
-        "summary": "System has potential remote code execution on SSH service."
-    }
+        temperature=0.3
+    )
+
+    # Extract and parse the response
+    try:
+        output_text = response.choices[0].message.content.strip()
+        return eval(output_text)  # ⚠️ Real-world projects should use json.loads instead
+    except Exception as e:
+        return {"error": f"Failed to parse OpenAI response: {str(e)}"}
