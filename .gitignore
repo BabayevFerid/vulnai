@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+.env
+.venv/
+*.log
+
+# VSCode / JetBrains
+.vscode/
+.idea/
+
+# Mac & Linux
+.DS_Store
+
+# Virtual environments
+venv/
+env/
+
+# Model files
+*.pkl
+*.h5
+
+# Output files
+*.out
+*.scan
+*.xml
+*.json
+scan_results/
+
+# OS
+Thumbs.db
